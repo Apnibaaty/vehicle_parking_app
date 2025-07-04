@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head><title>Reservation History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h2>Reservation History for {{ current_user.username }}</h2>
+    <a href="{{ url_for('user.user_dashboard') }}">⬅ Back to Dashboard</a>
+
+    {% if reservations %}
+        <table border="1" cellpadding="8" style="margin-top: 20px;">
+            <tr>
+                <th>Lot</th>
+                <th>Spot ID</th>
+                <th>Parked At</th>
+                <th>Left At</th>
+                <th>Duration</th>
+                <th>Cost</th>
+            </tr>
+            {% for r in reservations %}
+            <tr>
+                <td>{{ r.spot.lot.location }}</td>
+                <td>{{ r.spot.id }}</td>
+                <td>{{ r.parking_time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                <td>
+                    {% if r.leave_time %}
+                        {{ r.leave_time.strftime('%Y-%m-%d %H:%M:%S') }}
+                    {% else %}
+                        Still Parked
+                    {% endif %}
+                </td>
+                <td>
+                    {% if r.leave_time %}
+                        {% set duration = r.leave_time - r.parking_time %}
+                        {{ duration }}
+                    {% else %}
+                        Ongoing
+                    {% endif %}
+                </td>
+                <td>
+                    {% if r.cost %}
+                        ₹{{ r.cost }}
+                    {% elif r.leave_time %}
+                        Pending
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No parking history found.</p>
+    {% endif %}
+</body>
+</html>

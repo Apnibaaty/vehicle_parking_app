@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="top-bar">
+        <h2>Welcome {{ current_user.username }} 👋</h2>
+        <a href="/logout" class="logout-btn">Logout</a>
+    </div>
+
+    <p><a href="{{ url_for('user.history') }}">📄 View My Parking History</a></p>
+
+    {% if active_reservation %}
+    <h3>Your Active Booking</h3>
+    <div class="reservation-card">
+        <p><strong>Lot:</strong> {{ active_reservation.spot.lot.location }}</p>
+        <p><strong>Spot ID:</strong> {{ active_reservation.spot.id }}</p>
+        <p><strong>Booked At:</strong> {{ active_reservation.parking_time.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        <a href="{{ url_for('user.leave_spot') }}">🚗 Leave Spot</a>
+    </div>
+    {% else %}
+    <h3>Available Parking Lots</h3>
+    {% for lot in lots %}
+        <div class="parking-lot-card">
+            <strong>{{ lot.location }}</strong><br/>
+            {{ lot.address }}<br/>
+            PIN: {{ lot.pin_code }}<br/>
+            Price/hr: ₹{{ lot.price_per_hour }}<br/>
+            Available Spots:
+            {{ lot.spots | selectattr('status', 'equalto', 'A') | list | length }} /
+            {{ lot.total_spots }}<br/>
+            <a href="{{ url_for('user.book_spot', lot_id=lot.id) }}">Book Spot</a>
+        </div>
+    {% endfor %}
+    {% endif %}
+
+</body>
+</html>
